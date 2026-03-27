@@ -1,9 +1,12 @@
 import {test as base} from "@playwright/test";
 import { ToDoPage } from "../pages/todo-page";
+import { Utilities } from "../pages/utilities";
+
 
 
 type Fixtures = {
-    tdPage: ToDoPage
+    tdPage: ToDoPage;
+    utils: Utilities;
 }
 export const test = base.extend<Fixtures>({
     tdPage: async ({ page }, use) => {
@@ -11,6 +14,14 @@ export const test = base.extend<Fixtures>({
         await tdPage.openToDoDemo();
         await use(tdPage);
         await page.close();
+    },
+
+    utils: async ({}, use) => {
+        const utils = new Utilities();
+
+        await utils.messageBeforeTest("Beginning test...");
+        await use(utils);
+        await utils.messageAfterTest("Test complete");
     }
 })
 
