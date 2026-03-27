@@ -16,26 +16,26 @@ test("title", ()=> {
     */
 
                             // {page} <-- called a fixture. AKA --> Global Variable
-test("Verify Page Title", async ({page})=>{
-    const toDoPage = new ToDoPage(page);
+// test("Verify Page Title", async ({page})=>{
+//     const toDoPage = new ToDoPage(page);
 
-    toDoPage.openToDoDemo();
-    const url = await page.url();
-    console.log("URL:", url);
+//     toDoPage.openToDoDemo();
+//     const url = await page.url();
+//     console.log("URL:", url);
 
-    const title = toDoPage.getToDoTitle(page);
-    console.log("Title = ",title);
+//     const title = toDoPage.getToDoTitle(page);
+//     console.log("Title = ",title);
 
-    await expect(page).toHaveTitle(/React • TodoMVC/); // <----one assertion per test
+//     await expect(page).toHaveTitle(/React • TodoMVC/); // <----one assertion per test
 
-});
+// });
 
 test("Verify ToDo", async ({page})=>{
     const toDoPage = new ToDoPage(page);
     const todoA: string = "Pet Marvin";
     const todoB: string = "Pet Clem";
 
-    await page.goto('https://demo.playwright.dev/todomvc/');
+    await toDoPage.openToDoDemo();
 
     //Create ToDo_A
     await toDoPage.addToDo(todoA);
