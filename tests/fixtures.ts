@@ -2,17 +2,18 @@ import {test as base} from "@playwright/test";
 import { ToDoPage } from "../pages/todo-page";
 import { Utilities } from "../pages/utilities";
 
-
-
 type Fixtures = {
     tdPage: ToDoPage;
     utils: Utilities;
 }
+
 export const test = base.extend<Fixtures>({
     tdPage: async ({ page }, use) => {
         const tdPage = new ToDoPage(page);
+
         await tdPage.openToDoDemo();
         await use(tdPage);
+        // await use(new ToDoPage(page));
         await page.close();
     },
 

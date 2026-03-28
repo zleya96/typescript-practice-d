@@ -35,7 +35,7 @@ export default defineConfig({
 
   // 3. Global timeout: Time for the entire test run (None by default)
   globalTimeout: 20 * 60 * 1000, 
-  
+
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
