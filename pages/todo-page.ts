@@ -33,6 +33,11 @@ export class ToDoPage {
             .toBeVisible();
     }
 
+    //should return a boolean instead of using expect
+    async verifyTodoExists(todoName: string) {
+        return await this.page.locator(this.getLabelPath(todoName)).isVisible();
+    }
+
     async deleteToDo(todoName: string) {
         await this.page.locator(this.getLabelPath(todoName)).hover();
         await expect(
@@ -46,6 +51,11 @@ export class ToDoPage {
         const newPage = await context.newPage();
         await newPage.goto(this.todoUrl);
         return new ToDoPage(newPage);
+    }
+
+    async newTodoTab(context: any) {
+        const newPage = await context.newPage();
+        await newPage.goto(this.todoUrl);
     }
 
     //Probs should be in a Util class

@@ -3,12 +3,11 @@ import { test, expect } from "./fixtures.js";
 //tests take in two parameters: 1. Title of test 2. Function
 
 test.describe("ToDo Smoke", () => {
+
     test("Verify ToDo Created and Deleted", async ({ page, tdPage }, testInfo) => { // <--- tdPage is my ToDoPage object that I instantiated in fixtures.ts
 
         const todoA: string = "Pet Marvin";
         const todoB: string = "Pet Clem";
-
-        // await tdPage.openToDoDemo();
 
         //Create ToDo_A
         await tdPage.addToDo(todoA);
@@ -24,7 +23,7 @@ test.describe("ToDo Smoke", () => {
         await tdPage.deleteToDo(todoA);
 
         //Verify ToDo_A Deleted
-        await expect(page.locator(tdPage.getLabelPath(todoA))).toBeHidden;
+        await expect(page.locator(tdPage.getLabelPath(todoA))).toBeHidden();
 
     });
 
@@ -37,16 +36,21 @@ test.describe("ToDo Regression", () => {
         await utils.MessageDuringTest("This test is happening right now!");
 
     });
+
     test("Browser Test", async ({ tdPage, browser }) => {
-        const todoTitle = await tdPage.getToDoTitle();
-        console.log(todoTitle);
-        expect.soft(todoTitle).toEqual("React • TodoMVC");
+        //Create ToDo_A in Page 1
+        const todoA: string = "Pet Marvin";
+        await tdPage.addToDo(todoA);
+        await tdPage.verifyTodoExists(todoA);
 
+        //Verify Todo_A does exist in new tab
+        const context = await browser.newContext();
+        await tdPage.newTodoTab(context);
+        expect.soft(await tdPage.verifyTodoExists(todoA)).toBeTruthy();
+
+        //Verify ToDo_A does not exist in new page
         const tdPage2 = await tdPage.newToDoPage(browser);
-
-        const todoTitle2 = await tdPage2.getToDoTitle();
-        console.log(todoTitle2);
-        expect(todoTitle2).toEqual("React • TodoMVC");
+        expect(await tdPage2.verifyTodoExists(todoA)).toBeFalsy();
     });
 });
 
@@ -66,12 +70,8 @@ test.describe("API Tests", () => {
         const responseObject = await response.json();
         // console.log(responseObject);
 
-        // expect(responseObject.userId).toEqual(1);
         expect(responseStatus).toBe(200); // <-- GET
         expect(response.ok).toBeTruthy();
-
-
-
         // expect(responseStatus).toBe(201); // <-- POST
         // expect(responseStatus).toBe(204); // <-- DELETE
     })
@@ -99,7 +99,3 @@ test.describe("API Tests", () => {
 
     // })
 });
-
-
-// await request.put("www.url.com");
-// await request.delete("www.url.com");
