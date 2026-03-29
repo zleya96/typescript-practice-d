@@ -39,7 +39,8 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: blob-report
+        # add unique identifier to artifact name to prevent overwriting when multiple jobs upload with the same name
+        name: blob-report--attempt-${{ matrix.tag }}
         path: blob-report/
         retention-days: 30        
 
