@@ -29,18 +29,18 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test --grep ${{ matrix.tag }}
+      run: npx playwright test --grep ${{ matrix.tag }}  
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
+        name: playwright-report--${{ matrix.tag }}
         path: playwright-report/
         retention-days: 30        
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         # add unique identifier to artifact name to prevent overwriting when multiple jobs upload with the same name
-        name: blob-report--attempt-${{ matrix.tag }}
+        name: blob-report--${{ matrix.tag }}
         path: blob-report/
         retention-days: 30        
 
