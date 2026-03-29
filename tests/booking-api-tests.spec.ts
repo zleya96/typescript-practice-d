@@ -1,6 +1,7 @@
 import  {test, expect} from "@playwright/test";
 
 import postApiRequest from "../test-data/api-requests/POST-API-Request.json";
+import tokenApiRequest from "../test-data/api-requests/Token_API_Request.json";
 import { formatAPIRequest } from "../pages/API_helpers";
 
 import path from "path";
@@ -125,4 +126,104 @@ test.describe("Dynamic Data API Tests", () => {
         expect(getResponseJson.firstname).toBe("Marvin");
         expect(getResponseJson.lastname).toBe("The Cat");
     });
+
+    test("Booking API Test - Dynamic Data - PUT", async ({ request }) => {
+        // First, create a new booking with a POST request (similar to the previous test)
+        const filePath = path.join(__dirname, "../test-data/api-requests/Dynamic_POST_API_Request.json");
+        const jsonTemplate = fs.readFileSync(filePath, "utf-8");
+
+        const values = ["Marvin", "The Cat", 1500];
+
+        const postApiRequest = await formatAPIRequest(jsonTemplate, ...values);
+        const postResponse = await request.post(`/booking`, { data: JSON.parse(postApiRequest) }); 
+        
+        // Capture response details
+        const jsonPostResponse = await postResponse.json();
+        const statusText = await postResponse.statusText();
+
+        // Print some stuff for my own reference
+        console.log("Status Text:", statusText);
+        console.log("Response Body:", JSON.stringify(jsonPostResponse, null, 2));
+
+        // Assertions about the response status and headers
+        await expect(postResponse.status()).toBe(200);
+        await expect(jsonPostResponse.bookingid).toBeGreaterThan(0);
+
+        // Now use the response from the POST request to make a GET request with query parameters
+        const bookingId = jsonPostResponse.bookingid;
+        const firstName = jsonPostResponse.booking.firstname;
+        const lastName = jsonPostResponse.booking.lastname;
+
+        // const getResponse = await request.get(`/booking/${bookingId}?firstname=${firstName}&lastname=${lastName}`);');
+        const getResponse = await request.get(`/booking/${bookingId}`, {
+            params: {
+                bookingid: bookingId,
+                firstname: firstName,
+                lastname: lastName
+            }
+        }); // Alternative way to send query parameters using the params option
+
+        const getResponseJson = await getResponse.json();
+        console.log("GET Response Body:", JSON.stringify(getResponseJson, null, 2));
+
+        // Assertions about the GET response
+        expect(getResponse.status()).toBe(200);
+        expect(getResponseJson.firstname).toBe("Marvin");
+        expect(getResponseJson.lastname).toBe("The Cat");
+
+
+        //Generate Token for authentication (required for PUT request)
+        const tokenResponse = await request.post(`/auth`, { data: tokenApiRequest });
+        await expect(tokenResponse.status()).toBe(200);
+        await expect(tokenResponse.statusText()).toBe("OK");
+        const tokenResponseJson = await tokenResponse.json();
+        const token = tokenResponseJson.token;
+        console.log("Generated Token:", token);
+
+        // PUT Request to update the booking
+        const updatedValues = ["Clementine", "The Other Cat", 2000];
+        const putApiRequest = await formatAPIRequest(jsonTemplate, ...updatedValues);
+        const putResponse = await request.put(`/booking/${bookingId}`, { 
+            data: JSON.parse(putApiRequest),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Cookie': `token=${token}` // Send token in cookie for authentication
+            }
+        });
+        const putResponseJson = await putResponse.json();
+        console.log("PUT Response Body:", JSON.stringify(putResponseJson, null, 2));
+
+        // Assertions about the PUT response
+        await expect(putResponse.status()).toBe(200);
+        expect(putResponseJson.firstname).toBe("Clementine");
+        expect(putResponseJson.lastname).toBe("The Other Cat");
+    });
+});
+
+test.describe("Negative API Tests", () => {
+    test("Booking API Test - Negative Test - GET Nonexistent Booking", async ({ request }) => {
+        const getResponse = await request.get(`/booking/999999`); // Assuming this booking ID does not exist
+        const statusText = await getResponse.statusText();
+
+        console.log("Status Text:", statusText);
+
+        expect(getResponse.status()).toBe(404);
+        expect(statusText).toBe("Not Found");
+    });
+
+        test("Booking API Test - Negative Test - POST with Missing Required Fields", async ({ request }) => {       
+        const invalidPostData = {
+            "firstname": "Marvin"
+            // Missing lastname, totalprice, etc.
+        };
+
+        const postResponse = await request.post(`/booking`, { data: invalidPostData });
+        const statusText = await postResponse.statusText();
+
+        console.log("Status Text:", statusText);
+
+        expect(postResponse.status()).toBe(500); // Assuming the API returns 500 Internal Server Error for missing required fields
+        expect(statusText).toBe("Internal Server Error");
+    });              
 });
