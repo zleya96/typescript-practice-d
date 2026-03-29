@@ -12,124 +12,13 @@ jobs:
 # '@api_test'
 # '@mock_api_test'
 
-  Todo_Smoke_Tests:
-      timeout-minutes: 60
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Create report directory
-        run: mkdir -p playwright-report-Todo-Smoke
-      - name: Run Playwright tests
-        run: npx playwright test --grep @todo_smoke
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report-Todo-Smoke
-          path: playwright-report-Todo-Smoke/
-          retention-days: 30
-
-  Todo_Regression_Tests:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Create report directory
-      run: mkdir -p playwright-report-Todo-Regression  
-    - name: Run Playwright tests
-      run: npx playwright test --grep @todo_regression
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report-Todo-Regression
-        path: playwright-report-Todo-Regression/
-        retention-days: 30
-  
-  iFrame_Tests:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Create report directory
-      run: mkdir -p playwright-report-iFrame  
-    - name: Run Playwright tests
-      run: npx playwright test --grep @iframe_test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report-iFrame
-        path: playwright-report-iFrame/
-        retention-days: 30  
-        
-  API_Tests:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Create report directory
-      run: mkdir -p playwright-report-API  
-    - name: Run Playwright tests
-      run: npx playwright test --grep @api_test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report-API
-        path: playwright-report-API/
-        retention-days: 30
-    
-  Mock_API_Tests:
-      timeout-minutes: 60
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Create report directory
-        run: mkdir -p playwright-report-Mock-API  
-      - name: Run Playwright tests
-        run: npx playwright test --grep @mock_api_test
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report-Mock-API
-          path: playwright-report-Mock-API/
-          retention-days: 30
-
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: ['@iframe_test', '@todo_smoke', '@todo_regression', '@api_test', '@mock_api_test']
+    name: Playwright Tests - ${{ matrix.tag }}
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v5
@@ -140,10 +29,43 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test --grep ${{ matrix.tag }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
         path: playwright-report/
         retention-days: 30        
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: blob-report
+        path: blob-report/
+        retention-days: 30        
+
+  merge-reports:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Download Blob Report
+      uses: actions/download-artifact@v4
+      with:
+        name: blob-report
+        path: blob-report
+    
+    - name: Merge into HTML report
+      run: npx playwright merge-reports --reporter html ./blob-report 
+
+    - name: Upload Merged Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-report--attempt-${{ github.run_attempt }}   
+        path: playwright-report/
+        retention-days: 30 
