@@ -72,30 +72,5 @@ test.describe("API Tests", () => {
 
         expect(responseStatus).toBe(200); // <-- GET
         expect(response.ok).toBeTruthy();
-        // expect(responseStatus).toBe(201); // <-- POST
-        // expect(responseStatus).toBe(204); // <-- DELETE
     })
-
-    // test("Post Test", async ({ request }) => { 
-    //     const postResponse = await request.post("https://jsonplaceholder.typicode.com/posts", {
-    //         headers: {
-    //             'Content-type': 'application/json; charset=UTF-8',
-    //         },
-    //         data: {
-    //             title: "This is my title",
-    //             body: "This is my body",
-    //             userId: 201
-    //         } 
-    //     });
-
-    //     console.log(postResponse.json());
-
-    //     const response = await request.get("https://jsonplaceholder.typicode.com/posts/101");
-    //     const responseObject = await response.json();
-    //     // console.log(responseObject);
-    //     const responseStatus = await response.status();
-    //     console.log(responseStatus);
-    //     expect(responseStatus).toBe(201);
-
-    // })
 });
