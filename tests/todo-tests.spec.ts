@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures.js";
+import { todoTest as test, expect } from "./fixtures.ts";
 
 //tests take in two parameters: 1. Title of test 2. Function
 
@@ -9,21 +9,28 @@ test.describe("ToDo Smoke", { tag: ['@todo_smoke'] }, () => {
         const todoA: string = "Pet Marvin";
         const todoB: string = "Pet Clem";
 
-        //Create ToDo_A
-        await tdPage.addToDo(todoA);
-        await tdPage.addToDo(todoB);
-
-        const screenshot = await page.screenshot();
-        await testInfo.attach('ToDos Added', {
-            body: screenshot,
-            contentType: 'image/png',
+        await test.step("Add ToDos", async () => {
+            await tdPage.addToDo(todoA);
+            await tdPage.addToDo(todoB);
+            await tdPage.verifyTodoExists(todoA);
+            await tdPage.verifyTodoExists(todoB);
+            
+            const screenshot = await page.screenshot({ path: "todos-added.png" });
+            await testInfo.attach('ToDos Added', {
+                body: screenshot,
+                contentType: 'image/png',
+            });
         });
 
-        //Delete ToDo_A
-        await tdPage.deleteToDo(todoA);
 
-        //Verify ToDo_A Deleted
-        await expect(page.locator(tdPage.getLabelPath(todoA))).toBeHidden();
+
+        await test.step("Delete ToDo_A", async () => {
+            await tdPage.deleteToDo(todoA);
+            await expect(page.locator(tdPage.getLabelPath(todoA))).toBeHidden();
+        });
+
+        // test.step("Verify ToDo_A Deleted", async () => {
+        // });
 
     });
 });
@@ -53,7 +60,7 @@ test.describe("ToDo Regression", { tag: ['@todo_regression'] }, () => {
 });
 
 test.describe("API Example Test", { tag: ['@api_test'] }, () => {
-    
+
     test("Get Test", async ({ request }) => {
         const response = await request.get("https://jsonplaceholder.typicode.com/posts/1");
 
