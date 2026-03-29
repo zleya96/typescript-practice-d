@@ -37,7 +37,7 @@ test.describe("ToDo Regression", () => {
 
     });
 
-    test("Browser Test", async ({ tdPage, browser }) => {
+    test("Browsers Test", async ({ tdPage, browser }) => {
         //Create ToDo_A in Page 1
         const todoA: string = "Pet Marvin";
         await tdPage.addToDo(todoA);
