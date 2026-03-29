@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("IFrame Tests", () => {
+test.describe("IFrame Tests", { tag: ['@iframe_test'] }, () => {
+
     test("IFrame Test", async ({ page }) => {
         await page.goto("https://www.rahulshettyacademy.com/AutomationPractice/");
 

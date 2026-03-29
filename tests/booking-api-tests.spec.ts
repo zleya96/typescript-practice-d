@@ -10,9 +10,9 @@ import fs from "fs";
 test.use({
     baseURL: "https://restful-booker.herokuapp.com", // Can store in config or .env as well --- Need to research .env usage more (check config file for dotenv import)
 })
-                                            
+                    
 
-test.describe("Static File API Tests", () => {
+test.describe("Static File API Tests", { tag: ['@api_test'] },() => {
     test("Booking API Test - Static File - POST", async ({ request }) => {
         // POST Request
         const postResponse = await request.post(`/booking`, { data: postApiRequest }); 
@@ -55,7 +55,7 @@ test.describe("Static File API Tests", () => {
     });
 });
 
-test.describe("Dynamic Data API Tests", () => {
+test.describe("Dynamic Data API Tests", { tag: ['@api_test'] }, () => {
     test("Booking API Test - Dynamic Data - POST", async ({ request }) => {
         const filePath = path.join(__dirname, "../test-data/api-requests/Dynamic_POST_API_Request.json");
         const jsonTemplate = fs.readFileSync(filePath, "utf-8");
@@ -201,7 +201,7 @@ test.describe("Dynamic Data API Tests", () => {
     });
 });
 
-test.describe("Negative API Tests", () => {
+test.describe("Negative API Tests", { tag: ['@api_test'] }, () => {
     test("Booking API Test - Negative Test - GET Nonexistent Booking", async ({ request }) => {
         const getResponse = await request.get(`/booking/999999`); // Assuming this booking ID does not exist
         const statusText = await getResponse.statusText();
@@ -212,7 +212,7 @@ test.describe("Negative API Tests", () => {
         expect(statusText).toBe("Not Found");
     });
 
-        test("Booking API Test - Negative Test - POST with Missing Required Fields", async ({ request }) => {       
+    test("Booking API Test - Negative Test - POST with Missing Required Fields", async ({ request }) => {       
         const invalidPostData = {
             "firstname": "Marvin"
             // Missing lastname, totalprice, etc.

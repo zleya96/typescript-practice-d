@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures.js";
 
 //tests take in two parameters: 1. Title of test 2. Function
 
-test.describe("ToDo Smoke", () => {
+test.describe("ToDo Smoke", { tag: ['@todo_smoke'] }, () => {
 
     test("Verify ToDo Created and Deleted", async ({ page, tdPage }, testInfo) => { // <--- tdPage is my ToDoPage object that I instantiated in fixtures.ts
 
@@ -26,11 +26,9 @@ test.describe("ToDo Smoke", () => {
         await expect(page.locator(tdPage.getLabelPath(todoA))).toBeHidden();
 
     });
-
-    
 });
 
-test.describe("ToDo Regression", () => {
+test.describe("ToDo Regression", { tag: ['@todo_regression'] }, () => {
     test("regression examples", async ({ utils }) => {
 
         await utils.MessageDuringTest("This test is happening right now!");
@@ -54,7 +52,8 @@ test.describe("ToDo Regression", () => {
     });
 });
 
-test.describe("API Tests", () => {
+test.describe("API Example Test", { tag: ['@api_test'] }, () => {
+    
     test("Get Test", async ({ request }) => {
         const response = await request.get("https://jsonplaceholder.typicode.com/posts/1");
 
