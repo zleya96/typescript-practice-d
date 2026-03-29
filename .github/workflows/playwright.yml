@@ -33,14 +33,14 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report--${{ matrix.tag }}
+        name: playwright-report-${{ matrix.tag }}
         path: playwright-report/
         retention-days: 30        
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         # add unique identifier to artifact name to prevent overwriting when multiple jobs upload with the same name
-        name: blob-report--${{ matrix.tag }}
+        name: blob-report-${{ matrix.tag }}
         path: blob-report/
         retention-days: 30        
 
@@ -55,10 +55,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Download Blob Report
+    - name: Download All Blob Reports
       uses: actions/download-artifact@v4
       with:
-        name: blob-report
         path: blob-report
     
     - name: Merge into HTML report
