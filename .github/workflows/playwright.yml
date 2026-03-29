@@ -24,10 +24,10 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Run Playwright tests
-        run: npx playwright test --grep @todo_smoke
       - name: Create report directory
         run: mkdir -p playwright-report-Todo-Smoke
+      - name: Run Playwright tests
+        run: npx playwright test --grep @todo_smoke
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -47,10 +47,10 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Create report directory
+      run: mkdir -p playwright-report-Todo-Regression  
     - name: Run Playwright tests
       run: npx playwright test --grep @todo_regression
-    - name: Create report directory
-      run: mkdir -p playwright-report-Todo-Regression
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -70,10 +70,10 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Create report directory
+      run: mkdir -p playwright-report-iFrame  
     - name: Run Playwright tests
       run: npx playwright test --grep @iframe_test
-    - name: Create report directory
-      run: mkdir -p playwright-report-iFrame
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -93,10 +93,10 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Create report directory
+      run: mkdir -p playwright-report-API  
     - name: Run Playwright tests
       run: npx playwright test --grep @api_test
-    - name: Create report directory
-      run: mkdir -p playwright-report-API
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -116,10 +116,10 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Create report directory
+        run: mkdir -p playwright-report-Mock-API  
       - name: Run Playwright tests
         run: npx playwright test --grep @mock_api_test
-      - name: Create report directory
-        run: mkdir -p playwright-report-Mock-API
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
